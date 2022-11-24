@@ -100,62 +100,6 @@ func TestGetAccountAPI(t *testing.T) {
 			tc.responseChecker(t, recorder)
 		})
 	}
-
-	// ctrl := gomock.NewController(t)
-	// defer ctrl.Finish()
-
-	// store := mockdb.NewMockStore(ctrl) // mock yg udah dibuat
-
-	// // build stubs
-	// store.EXPECT().
-	// 	GetAccountById(gomock.Any(), gomock.Eq(acc.ID)).
-	// 	Times(1).
-	// 	Return(acc, nil)
-
-	// // start test server and send request
-	// server := NewServer(store)
-
-	// t.Run("Status 200", func(t *testing.T) {
-	// 	recorder200 := httptest.NewRecorder()
-
-	// 	url := fmt.Sprintf("/account/%d", acc.ID)
-	// 	request, err := http.NewRequest(http.MethodGet, url, nil)
-	// 	assert.NoError(t, err)
-
-	// 	server.router.ServeHTTP(recorder200, request)
-	// 	assert.Equal(t, http.StatusOK, recorder200.Code)
-	// 	requireBodyMatchAccount(t, recorder200.Body, acc)
-	// })
-
-	// t.Run("Status 400", func(t *testing.T) {
-	// 	recorder400 := httptest.NewRecorder()
-
-	// 	url := fmt.Sprintf("/account/-1")
-	// 	request, err := http.NewRequest(http.MethodGet, url, nil)
-	// 	assert.NoError(t, err)
-
-	// 	server.router.ServeHTTP(recorder400, request)
-	// 	assert.Equal(t, http.StatusBadRequest, recorder400.Code)
-
-	// 	var emptyAcc db.Account
-	// 	requireBodyMatchAccount(t, recorder400.Body, emptyAcc)
-	// })
-
-	// t.Run("Status 404", func(t *testing.T) {
-	// 	recorder404 := httptest.NewRecorder()
-
-	// 	url := fmt.Sprintf("/account/2")
-	// 	request, err := http.NewRequest(http.MethodGet, url, nil)
-	// 	assert.NoError(t, err)
-
-	// 	fmt.Println("requst", request)
-	// 	fmt.Println("idd", acc.ID)
-
-	// 	server.router.ServeHTTP(recorder404, request)
-	// 	assert.Equal(t, http.StatusNotFound, recorder404.Code)
-	// })
-
-	//assert.Equal(t, "http.StatusOK", recorder)
 }
 
 func randomAccount() db.Account {
