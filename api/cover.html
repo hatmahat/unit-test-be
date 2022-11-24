@@ -55,11 +55,11 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">be-4-rs-crud/api/account.go (18.4%)</option>
+				<option value="file0">be-4-rs-crud/api/account_controller.go (100.0%)</option>
 				
-				<option value="file1">be-4-rs-crud/api/account_controller.go (100.0%)</option>
+				<option value="file1">be-4-rs-crud/api/account_handler.go (31.6%)</option>
 				
-				<option value="file2">be-4-rs-crud/api/server.go (85.7%)</option>
+				<option value="file2">be-4-rs-crud/api/server.go (75.0%)</option>
 				
 				</select>
 			</div>
@@ -83,6 +83,20 @@
 		<div id="content">
 		
 		<pre class="file" id="file0" style="display: none">package api
+
+import (
+        "github.com/gin-gonic/gin"
+)
+
+func InitAccountController(server *Server, router *gin.Engine) <span class="cov10" title="4">{
+        router.POST("/account", server.createAccount)
+        router.GET("/account/:id", server.getAccountById)
+        router.DELETE("/account/:id", server.deleteAccount)
+        router.GET("/accounts", server.listAccounts)
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package api
 
 import (
         db "be-4-rs-crud/src/db/sqlc"
@@ -124,7 +138,7 @@ type getAccountByIdRequest struct {
         ID int64 `uri:"id" binding:"required,min=1"`
 }
 
-func (server *Server) getAccountById(ctx *gin.Context) <span class="cov10" title="2">{
+func (server *Server) getAccountById(ctx *gin.Context) <span class="cov10" title="4">{
         // id := ctx.Param("id")
         // idInt, _ := strconv.Atoi(id)
 
@@ -134,13 +148,13 @@ func (server *Server) getAccountById(ctx *gin.Context) <span class="cov10" title
                 return
         }</span>
 
-        <span class="cov1" title="1">acc, err := server.store.GetAccountById(ctx, req.ID)
-        if err != nil </span><span class="cov0" title="0">{
-                if err == sql.ErrNoRows </span><span class="cov0" title="0">{
+        <span class="cov8" title="3">acc, err := server.store.GetAccountById(ctx, req.ID)
+        if err != nil </span><span class="cov5" title="2">{
+                if err == sql.ErrNoRows </span><span class="cov1" title="1">{
                         ctx.JSON(http.StatusNotFound, errorResponse(err))
                         return
                 }</span>
-                <span class="cov0" title="0">ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+                <span class="cov1" title="1">ctx.JSON(http.StatusInternalServerError, errorResponse(err))
                 return</span>
         }
 
@@ -190,20 +204,6 @@ func (server *Server) deleteAccount(ctx *gin.Context) <span class="cov0" title="
 }
 </pre>
 		
-		<pre class="file" id="file1" style="display: none">package api
-
-import (
-        "github.com/gin-gonic/gin"
-)
-
-func InitAccountController(server *Server, router *gin.Engine) <span class="cov8" title="1">{
-        router.POST("/account", server.createAccount)
-        router.GET("/account/:id", server.getAccountById)
-        router.DELETE("/account/:id", server.deleteAccount)
-        router.GET("/accounts", server.listAccounts)
-}</span>
-</pre>
-		
 		<pre class="file" id="file2" style="display: none">package api
 
 import (
@@ -217,7 +217,7 @@ type Server struct {
         router *gin.Engine
 }
 
-func NewServer(store db.Store) *Server <span class="cov8" title="1">{
+func NewServer(store db.Store) *Server <span class="cov10" title="4">{
         server := &amp;Server{store: store}
         router := gin.Default()
 
@@ -231,7 +231,11 @@ func (server *Server) Start(address string) error <span class="cov0" title="0">{
         return server.router.Run(address)
 }</span>
 
-func errorResponse(err error) gin.H <span class="cov8" title="1">{
+func (server *Server) Router() *gin.Engine <span class="cov0" title="0">{
+        return server.router
+}</span>
+
+func errorResponse(err error) gin.H <span class="cov8" title="3">{
         return gin.H{"error": err.Error()}
 }</span>
 </pre>

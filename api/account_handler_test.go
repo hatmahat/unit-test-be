@@ -52,6 +52,7 @@ func TestGetAccountAPI(t *testing.T) {
 			},
 			responseChecker: func(t *testing.T, recorder *httptest.ResponseRecorder) {
 				assert.Equal(t, http.StatusNotFound, recorder.Code)
+				requireBodyMatchResponse(t, recorder.Body, map[string]interface{}{"error": "sql: no rows in result set"})
 			},
 		},
 		{
@@ -116,6 +117,18 @@ func requireBodyMatchAccount(t *testing.T, body *bytes.Buffer, acc db.Account) {
 
 	var gotAcc db.Account
 	err = json.Unmarshal(data, &gotAcc)
+
 	assert.NoError(t, err)
 	assert.Equal(t, acc, gotAcc)
+}
+
+func requireBodyMatchResponse(t *testing.T, body *bytes.Buffer, expected interface{}) {
+	data, err := ioutil.ReadAll(body)
+	assert.NoError(t, err)
+
+	var gotResponse interface{}
+	err = json.Unmarshal(data, &gotResponse)
+
+	assert.NoError(t, err)
+	assert.Equal(t, expected, gotResponse)
 }
