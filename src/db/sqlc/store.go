@@ -7,19 +7,24 @@ import (
 	"strconv"
 )
 
-type Store struct {
-	*Queries // untuk import  ke controller bisa dicontoh
+type Store interface {
+	Querier
+	TransactionTx(ctx context.Context, arg TransactionParams) (TransactionResult, error)
+}
+
+type SQLStore struct {
+	*Queries // untuk import  ke controller
 	db       *sql.DB
 }
 
-func NewStore(db *sql.DB) *Store {
-	return &Store{
+func NewStore(db *sql.DB) Store {
+	return &SQLStore{
 		db:      db,
 		Queries: New(db),
 	}
 }
 
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
+func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx, err := store.db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
@@ -50,7 +55,7 @@ type TransactionResult struct {
 	PaymentBy   PaymentBy   `json:"payment_by"`
 }
 
-func (store *Store) TransactionTx(ctx context.Context, arg TransactionParams) (TransactionResult, error) {
+func (store *SQLStore) TransactionTx(ctx context.Context, arg TransactionParams) (TransactionResult, error) {
 	var result TransactionResult
 
 	err := store.execTx(ctx, func(q *Queries) error {

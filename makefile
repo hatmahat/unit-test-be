@@ -14,10 +14,10 @@ migratedown:
 	migrate -path db/migration -database "postgresql://root:mysecretpassword@localhost:5431/simple_trx?sslmode=disable" -verbose down
 
 sqlc-generate:
-	docker run --rm -v "%cd%:/src" -w /src kjconroy/sqlc generate
+	docker run --rm -v "C:\Users\Mahatma Ageng Wisesa\Desktop\Unit Test\go\DB-Migration\be-4-rd:/src" -w /src kjconroy/sqlc generate
 
 sqlc-init:
-	docker run --rm -v "%cd%:/src" -w /src kjconroy/sqlc init
+	docker run --rm -v "C:\Users\Mahatma Ageng Wisesa\Desktop\Unit Test\go\DB-Migration\be-4-rd:/src" -w /src kjconroy/sqlc init
 
 go-test-cover:
 	go test -covermode=count -coverpkg=./... -coverprofile cover.out -v ./...
@@ -26,4 +26,7 @@ go-test-cover:
 server:
 	go run main.go
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc-generate sqlc-init go-test-cover server
+mockgen:
+	mockgen -package mockdb -destination src/db/mock/store.go be-4-rs-crud/src/db/sqlc Store
+
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc-generate sqlc-init go-test-cover server mockgen
