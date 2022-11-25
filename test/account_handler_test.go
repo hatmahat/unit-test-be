@@ -14,6 +14,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -101,62 +102,86 @@ func TestGetAccountAPI(t *testing.T) {
 			tc.responseChecker(t, recorder)
 		})
 	}
+}
 
-	// ctrl := gomock.NewController(t)
-	// defer ctrl.Finish()
+func TestCreateAccountAPI(t *testing.T) {
+	acc := randomAccount()
 
-	// store := mockdb.NewMockStore(ctrl) // mock yg udah dibuat
+	testCases := []struct {
+		name            string
+		body            gin.H
+		buildStubs      func(store *mockdb.MockStore)
+		responseChecker func(t *testing.T, recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "Status 200",
+			body: gin.H{
+				"user_name": acc.UserName,
+				"balance":   acc.Balance,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				arg := db.CreateAccountParams{
+					UserName: acc.UserName,
+					Balance:  acc.Balance,
+				}
+				store.EXPECT().CreateAccount(gomock.Any(), gomock.Eq(arg)).Times(1).Return(acc, nil)
+			},
+			responseChecker: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "Status 400",
+			body: gin.H{
+				"user_name": "",
+				"balance":   "",
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().CreateAccount(gomock.Any(), gomock.Any()).Times(0)
+			},
+			responseChecker: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		// {
+		// 	name: "Status 500",
+		// 	body: gin.H{
+		// 		"balance": acc.Balance,
+		// 	},
+		// 	buildStubs: func(store *mockdb.MockStore) {
+		// 		store.EXPECT().
+		// 			CreateAccount(gomock.Any(), gomock.Any()).
+		// 			Times(1).
+		// 			Return(db.Account{}, sql.ErrConnDone)
+		// 	},
+		// 	responseChecker: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+		// 		assert.Equal(t, http.StatusInternalServerError, recorder.Code)
+		// 	},
+		// },
+	}
 
-	// // build stubs
-	// store.EXPECT().
-	// 	GetAccountById(gomock.Any(), gomock.Eq(acc.ID)).
-	// 	Times(1).
-	// 	Return(acc, nil)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-	// // start test server and send request
-	// server := NewServer(store)
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
 
-	// t.Run("Status 200", func(t *testing.T) {
-	// 	recorder200 := httptest.NewRecorder()
+			server := api.NewServer(store)
+			recorder := httptest.NewRecorder()
 
-	// 	url := fmt.Sprintf("/account/%d", acc.ID)
-	// 	request, err := http.NewRequest(http.MethodGet, url, nil)
-	// 	assert.NoError(t, err)
+			// Marshal body ke JSON
+			data, err := json.Marshal(tc.body)
+			assert.NoError(t, err)
 
-	// 	server.router.ServeHTTP(recorder200, request)
-	// 	assert.Equal(t, http.StatusOK, recorder200.Code)
-	// 	requireBodyMatchAccount(t, recorder200.Body, acc)
-	// })
+			request, err := http.NewRequest(http.MethodPost, "/account", bytes.NewReader(data))
+			assert.NoError(t, err)
 
-	// t.Run("Status 400", func(t *testing.T) {
-	// 	recorder400 := httptest.NewRecorder()
-
-	// 	url := fmt.Sprintf("/account/-1")
-	// 	request, err := http.NewRequest(http.MethodGet, url, nil)
-	// 	assert.NoError(t, err)
-
-	// 	server.router.ServeHTTP(recorder400, request)
-	// 	assert.Equal(t, http.StatusBadRequest, recorder400.Code)
-
-	// 	var emptyAcc db.Account
-	// 	requireBodyMatchAccount(t, recorder400.Body, emptyAcc)
-	// })
-
-	// t.Run("Status 404", func(t *testing.T) {
-	// 	recorder404 := httptest.NewRecorder()
-
-	// 	url := fmt.Sprintf("/account/2")
-	// 	request, err := http.NewRequest(http.MethodGet, url, nil)
-	// 	assert.NoError(t, err)
-
-	// 	fmt.Println("requst", request)
-	// 	fmt.Println("idd", acc.ID)
-
-	// 	server.router.ServeHTTP(recorder404, request)
-	// 	assert.Equal(t, http.StatusNotFound, recorder404.Code)
-	// })
-
-	//assert.Equal(t, "http.StatusOK", recorder)
+			server.Router().ServeHTTP(recorder, request)
+			tc.responseChecker(t, recorder)
+		})
+	}
 }
 
 func randomAccount() db.Account {

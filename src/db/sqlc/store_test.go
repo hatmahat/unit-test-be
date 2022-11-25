@@ -26,8 +26,8 @@ func TestTransactionTx(t *testing.T) {
 			Amount:      trxRandomAmount,
 		})
 
-		newAccBalance, _ := store.GetAccountById(context.Background(), acc.ID)
-		newAccBalanceInt, _ := strconv.Atoi(newAccBalance.Balance) // untuk ngecek apakah balance beneran terupdate
+		newAccBalance, _ := store.GetAccountById(context.Background(), acc.ID) // diambil dari db yg udah diperbarui
+		newAccBalanceInt, _ := strconv.Atoi(newAccBalance.Balance)             // untuk ngecek apakah balance beneran terupdate
 
 		assert.NoError(t, err)
 		assert.NotEmpty(t, trx.Transaction)
@@ -37,7 +37,7 @@ func TestTransactionTx(t *testing.T) {
 
 		assert.Equal(t, trx.Transaction.AccountID, acc.ID)
 		assert.Equal(t, trx.Transaction.PaymentID, pymt.ID)
-		assert.Equal(t, currentBalanceInt-int(trxRandomAmount), newAccBalanceInt)
+		assert.Equal(t, currentBalanceInt-int(trxRandomAmount), newAccBalanceInt) // check balance beneran berkurang
 
 		// cek beneran terbuat di db atau nggak
 		trxGet, err := store.GetTransactionsById(context.Background(), trx.Transaction.ID)
