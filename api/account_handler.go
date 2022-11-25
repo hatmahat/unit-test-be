@@ -41,9 +41,6 @@ type getAccountByIdRequest struct {
 }
 
 func (server *Server) getAccountById(ctx *gin.Context) {
-	// id := ctx.Param("id")
-	// idInt, _ := strconv.Atoi(id)
-
 	var req getAccountByIdRequest
 	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))

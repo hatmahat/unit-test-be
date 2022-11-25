@@ -143,25 +143,22 @@ func TestCreateAccountAPI(t *testing.T) {
 				assert.Equal(t, http.StatusBadRequest, recorder.Code)
 			},
 		},
-		// {
-		// 	name: "Status 500",
-		// 	body: gin.H{
-		// 		"balance": acc.Balance,
-		// 	},
-		// 	buildStubs: func(store *mockdb.MockStore) {
-
-		// 		store.EXPECT().
-		// 			CreateAccount(gomock.Any(), db.CreateAccountParams{
-		// 				// UserName: acc.UserName,
-		// 				Balance: acc.Balance,
-		// 			}).
-		// 			Times(1).
-		// 			Return(db.Account{}, sql.ErrConnDone)
-		// 	},
-		// 	responseChecker: func(t *testing.T, recorder *httptest.ResponseRecorder) {
-		// 		assert.Equal(t, http.StatusInternalServerError, recorder.Code)
-		// 	},
-		// },
+		{
+			name: "Status 500",
+			body: gin.H{
+				"user_name": acc.UserName,
+				"balance":   acc.Balance,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					CreateAccount(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.Account{}, sql.ErrConnDone)
+			},
+			responseChecker: func(t *testing.T, recorder *httptest.ResponseRecorder) {
+				assert.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
 	}
 
 	for _, tc := range testCases {
