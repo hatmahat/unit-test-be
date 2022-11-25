@@ -149,8 +149,12 @@ func TestCreateAccountAPI(t *testing.T) {
 		// 		"balance": acc.Balance,
 		// 	},
 		// 	buildStubs: func(store *mockdb.MockStore) {
+
 		// 		store.EXPECT().
-		// 			CreateAccount(gomock.Any(), gomock.Any()).
+		// 			CreateAccount(gomock.Any(), db.CreateAccountParams{
+		// 				// UserName: acc.UserName,
+		// 				Balance: acc.Balance,
+		// 			}).
 		// 			Times(1).
 		// 			Return(db.Account{}, sql.ErrConnDone)
 		// 	},

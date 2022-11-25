@@ -57,7 +57,7 @@
 				
 				<option value="file0">be-4-rs-crud/api/account_controller.go (100.0%)</option>
 				
-				<option value="file1">be-4-rs-crud/api/account_handler.go (31.6%)</option>
+				<option value="file1">be-4-rs-crud/api/account_handler.go (52.6%)</option>
 				
 				<option value="file2">be-4-rs-crud/api/server.go (75.0%)</option>
 				
@@ -88,7 +88,7 @@ import (
         "github.com/gin-gonic/gin"
 )
 
-func InitAccountController(server *Server, router *gin.Engine) <span class="cov10" title="4">{
+func InitAccountController(server *Server, router *gin.Engine) <span class="cov10" title="6">{
         router.POST("/account", server.createAccount)
         router.GET("/account/:id", server.getAccountById)
         router.DELETE("/account/:id", server.deleteAccount)
@@ -113,14 +113,14 @@ type createAccountRequest struct {
 }
 
 // create Account Handler
-func (server *Server) createAccount(ctx *gin.Context) <span class="cov0" title="0">{
+func (server *Server) createAccount(ctx *gin.Context) <span class="cov5" title="2">{
         var req createAccountRequest
-        if err := ctx.ShouldBindJSON(&amp;req); err != nil </span><span class="cov0" title="0">{
+        if err := ctx.ShouldBindJSON(&amp;req); err != nil </span><span class="cov1" title="1">{
                 ctx.JSON(http.StatusBadRequest, errorResponse(err))
                 return
         }</span>
 
-        <span class="cov0" title="0">arg := db.CreateAccountParams{
+        <span class="cov1" title="1">arg := db.CreateAccountParams{
                 UserName: req.UserName,
                 Balance:  req.Balance,
         }
@@ -131,7 +131,7 @@ func (server *Server) createAccount(ctx *gin.Context) <span class="cov0" title="
                 return
         }</span>
 
-        <span class="cov0" title="0">ctx.JSON(http.StatusOK, acc)</span>
+        <span class="cov1" title="1">ctx.JSON(http.StatusOK, acc)</span>
 }
 
 type getAccountByIdRequest struct {
@@ -217,7 +217,7 @@ type Server struct {
         router *gin.Engine
 }
 
-func NewServer(store db.Store) *Server <span class="cov10" title="4">{
+func NewServer(store db.Store) *Server <span class="cov10" title="6">{
         server := &amp;Server{store: store}
         router := gin.Default()
 
@@ -235,7 +235,7 @@ func (server *Server) Router() *gin.Engine <span class="cov0" title="0">{
         return server.router
 }</span>
 
-func errorResponse(err error) gin.H <span class="cov8" title="3">{
+func errorResponse(err error) gin.H <span class="cov7" title="4">{
         return gin.H{"error": err.Error()}
 }</span>
 </pre>

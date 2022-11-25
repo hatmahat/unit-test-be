@@ -7,11 +7,14 @@ createdb:
 dropdb:
 	docker exec -it postgres12 dropdb simple_trx
 
-migrateup:
-	migrate -path db/migration -database "postgresql://root:mysecretpassword@localhost:5431/simple_trx?sslmode=disable" -verbose up
+migrate-create:
+	migrate create -ext sql -dir src/db/migration -seq init_schema
 
-migratedown:
-	migrate -path db/migration -database "postgresql://root:mysecretpassword@localhost:5431/simple_trx?sslmode=disable" -verbose down
+migrate-up:
+	migrate -path src/db/migration -database "postgresql://root:mysecretpassword@localhost:5431/simple_trx?sslmode=disable" -verbose up
+
+migrate-down:
+	migrate -path src/db/migration -database "postgresql://root:mysecretpassword@localhost:5431/simple_trx?sslmode=disable" -verbose down
 
 sqlc-generate:
 	docker run --rm -v "C:\Users\Mahatma Ageng Wisesa\Desktop\Unit Test\go\DB-Migration\be-4-rd:/src" -w /src kjconroy/sqlc generate
@@ -29,4 +32,4 @@ server:
 mockgen:
 	mockgen -package mockdb -destination src/db/mock/store.go be-4-rs-crud/src/db/sqlc Store
 
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc-generate sqlc-init go-test-cover server mockgen
+.PHONY: postgres createdb dropdb migrate-create migrate-up migrate-down sqlc-generate sqlc-init go-test-cover server mockgen

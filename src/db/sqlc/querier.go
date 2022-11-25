@@ -19,6 +19,8 @@ type Querier interface {
 	GetPaymentBy(ctx context.Context, arg GetPaymentByParams) ([]PaymentBy, error)
 	GetPaymentById(ctx context.Context, id int64) (PaymentBy, error)
 	GetTransactions(ctx context.Context, arg GetTransactionsParams) ([]Transaction, error)
+	// -- name: GetTransactionsByUserId :many
+	// SELECT * FROM transactions WHERE account_id = $1;
 	GetTransactionsById(ctx context.Context, id int64) (Transaction, error)
 	ListAccounts(ctx context.Context, arg ListAccountsParams) ([]Account, error)
 	UpdateAccount(ctx context.Context, arg UpdateAccountParams) (Account, error)

@@ -9,6 +9,9 @@ INSERT INTO transactions (
 -- name: GetTransactions :many
 SELECT * FROM transactions LIMIT $1 OFFSET $2;
 
+-- -- name: GetTransactionsByUserId :many
+-- SELECT * FROM transactions WHERE account_id = $1;
+
 -- name: GetTransactionsById :one
 SELECT * FROM transactions WHERE id = $1;
 

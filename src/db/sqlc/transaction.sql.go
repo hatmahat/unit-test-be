@@ -93,9 +93,12 @@ func (q *Queries) GetTransactions(ctx context.Context, arg GetTransactionsParams
 }
 
 const getTransactionsById = `-- name: GetTransactionsById :one
+
 SELECT id, account_id, payment_id, created_at, "desc", amount FROM transactions WHERE id = $1
 `
 
+// -- name: GetTransactionsByUserId :many
+// SELECT * FROM transactions WHERE account_id = $1;
 func (q *Queries) GetTransactionsById(ctx context.Context, id int64) (Transaction, error) {
 	row := q.db.QueryRowContext(ctx, getTransactionsById, id)
 	var i Transaction

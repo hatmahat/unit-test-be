@@ -344,19 +344,24 @@ import (
         "strconv"
 )
 
-type Store struct {
-        *Queries
-        db *sql.DB
+type Store interface {
+        Querier
+        TransactionTx(ctx context.Context, arg TransactionParams) (TransactionResult, error)
 }
 
-func NewStore(db *sql.DB) *Store <span class="cov1" title="1">{
-        return &amp;Store{
+type SQLStore struct {
+        *Queries // untuk import  ke controller
+        db       *sql.DB
+}
+
+func NewStore(db *sql.DB) Store <span class="cov1" title="1">{
+        return &amp;SQLStore{
                 db:      db,
                 Queries: New(db),
         }
 }</span>
 
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error <span class="cov10" title="3">{
+func (store *SQLStore) execTx(ctx context.Context, fn func(*Queries) error) error <span class="cov10" title="3">{
         tx, err := store.db.BeginTx(ctx, nil)
         if err != nil </span><span class="cov0" title="0">{
                 return err
@@ -387,7 +392,7 @@ type TransactionResult struct {
         PaymentBy   PaymentBy   `json:"payment_by"`
 }
 
-func (store *Store) TransactionTx(ctx context.Context, arg TransactionParams) (TransactionResult, error) <span class="cov10" title="3">{
+func (store *SQLStore) TransactionTx(ctx context.Context, arg TransactionParams) (TransactionResult, error) <span class="cov10" title="3">{
         var result TransactionResult
 
         err := store.execTx(ctx, func(q *Queries) error </span><span class="cov10" title="3">{
@@ -524,9 +529,12 @@ func (q *Queries) GetTransactions(ctx context.Context, arg GetTransactionsParams
 }
 
 const getTransactionsById = `-- name: GetTransactionsById :one
+
 SELECT id, account_id, payment_id, created_at, "desc", amount FROM transactions WHERE id = $1
 `
 
+// -- name: GetTransactionsByUserId :many
+// SELECT * FROM transactions WHERE account_id = $1;
 func (q *Queries) GetTransactionsById(ctx context.Context, id int64) (Transaction, error) <span class="cov1" title="1">{
         row := q.db.QueryRowContext(ctx, getTransactionsById, id)
         var i Transaction
