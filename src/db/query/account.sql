@@ -21,4 +21,4 @@ WHERE id = $1 RETURNING *;
 DELETE FROM accounts WHERE id = $1;
 
 -- -- name: GetAccountAll :many
--- SELECT * FROM accounts;
+-- SELECT * FROM (SELECT * FROM WHERE id );

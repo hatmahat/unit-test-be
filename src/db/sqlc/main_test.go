@@ -13,8 +13,6 @@ import (
 var testQueries *Queries
 var testDB *sql.DB // reuse db conn
 
-//var TestQueries *Queries
-
 func TestMain(m *testing.M) {
 	config, err := utils.LoadConfig("../../..")
 	if err != nil {
@@ -27,8 +25,6 @@ func TestMain(m *testing.M) {
 	}
 
 	testQueries = New(testDB)
-	//TestQueries.Queries = New(testDB)
-	//TestQueries = New(testDB)
 
 	os.Exit(m.Run())
 }
